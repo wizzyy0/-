@@ -152,10 +152,10 @@ td input:focus {
 
 td input.invalid { border-color: var(--danger); }
 
-/* убираем стрелочки у number-полей */
-td input::-webkit-outer-spin-button,
-td input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-td input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+/* убираем стрелочки (спиннеры) у ВСЕХ number-полей: таблица + автозаполнение */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 
 /* ---------- Кнопки ---------- */
 .btn {
