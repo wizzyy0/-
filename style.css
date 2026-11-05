@@ -11,6 +11,18 @@
   --radius: 14px;
 }
 
+/* Тёмная тема */
+:root[data-theme="dark"] {
+  --bg: #0f1115;
+  --card: #171a20;
+  --text: #e8eaee;
+  --muted: #9aa0aa;
+  --line: #262930;
+  --accent: #5b8cf7;
+  --accent-soft: #1c2740;
+  --danger: #f87171;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -19,7 +31,36 @@ body {
   color: var(--text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.25s, color 0.25s;
 }
+
+/* ---------- Переключатель темы ---------- */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, transform 0.1s, background 0.25s;
+}
+
+.theme-toggle:hover { color: var(--text); border-color: var(--accent); }
+.theme-toggle:active { transform: scale(0.92); }
+
+.theme-toggle .icon-sun { display: none; }
+:root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+:root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
+/* убираем мигание при загрузке: тема ставится до отрисовки (см. script.js в <head> инлайном) */
 
 /* ---------- Шапка ---------- */
 .hero {
@@ -53,6 +94,7 @@ body {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 24px;
+  transition: background 0.25s, border-color 0.25s;
 }
 
 .card-head {

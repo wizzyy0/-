@@ -8,9 +8,25 @@ const swapCheckbox = document.getElementById('swapAxes');
 const errorBox = document.getElementById('error');
 const chartCard = document.getElementById('chartCard');
 const downloadBtn = document.getElementById('download');
+const root = document.documentElement;
 
 let chart = null;
 let rowCounter = 0;
+
+/* ---------- Тема ---------- */
+
+function isDark() { return root.getAttribute('data-theme') === 'dark'; }
+
+function chartTheme() {
+  const dark = isDark();
+  return {
+    grid: dark ? '#262930' : '#f0f1f4',
+    tick: dark ? '#9aa0aa' : '#6b7078',
+    title: dark ? '#e8eaee' : '#17181a',
+    pointBg: dark ? '#171a20' : '#ffffff',
+    fill: dark ? 'rgba(91, 140, 247, 0.12)' : 'rgba(37, 99, 235, 0.08)'
+  };
+}
 
 /* ---------- Строки таблицы ---------- */
 
@@ -115,20 +131,23 @@ function buildChart() {
 
   if (chart) chart.destroy();
 
+  const t = chartTheme();
+  Chart.defaults.color = t.tick;
+
   chart = new Chart(document.getElementById('chart'), {
     type: 'line',
     data: {
       datasets: [{
         label: `${yLabel} / ${xLabel}`,
         data: pts,
-        borderColor: '#2563eb',
-        backgroundColor: 'rgba(37, 99, 235, 0.08)',
+        borderColor: isDark() ? '#5b8cf7' : '#2563eb',
+        backgroundColor: t.fill,
         fill: true,
         tension: 0.3,
         pointRadius: 5,
         pointHoverRadius: 7,
-        pointBackgroundColor: '#ffffff',
-        pointBorderColor: '#2563eb',
+        pointBackgroundColor: t.pointBg,
+        pointBorderColor: isDark() ? '#5b8cf7' : '#2563eb',
         pointBorderWidth: 2,
       }]
     },
@@ -149,13 +168,15 @@ function buildChart() {
         // и точки теряют координаты (уезжают в 0)
         x: {
           type: 'linear',
-          title: { display: true, text: xLabel },
-          grid: { color: '#f0f1f4' }
+          title: { display: true, text: xLabel, color: t.title },
+          grid: { color: t.grid },
+          ticks: { color: t.tick }
         },
         y: {
           type: 'linear',
-          title: { display: true, text: yLabel },
-          grid: { color: '#f0f1f4' }
+          title: { display: true, text: yLabel, color: t.title },
+          grid: { color: t.grid },
+          ticks: { color: t.tick }
         }
       }
     }
@@ -235,6 +256,15 @@ function autofill() {
 afFill.addEventListener('click', autofill);
 
 /* ---------- События ---------- */
+
+// переключение темы: светлая <-> тёмная с сохранением выбора
+const themeToggle = document.getElementById('themeToggle');
+themeToggle.addEventListener('click', () => {
+  const next = isDark() ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  if (chart) buildChart(); // перерисовать график под тему
+});
 
 addRowBtn.addEventListener('click', addRow);
 buildBtn.addEventListener('click', buildChart);
