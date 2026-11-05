@@ -37,6 +37,33 @@
       <p id="error" class="error" hidden></p>
     </section>
 
+    <!-- АВТОЗАПОЛНЕНИЕ -->
+    <section class="card">
+      <div class="card-head">
+        <h2>Автозаполнение</h2>
+      </div>
+      <div class="autofill-row">
+        <label>Колонка
+          <select id="afCol">
+            <option value="hz" selected>Hz (Y)</option>
+            <option value="db">dB (X)</option>
+          </select>
+        </label>
+        <label>Начало
+          <input type="number" id="afStart" step="any" value="1000">
+        </label>
+        <label>Конец
+          <input type="number" id="afEnd" step="any" value="1500">
+        </label>
+        <label>Шаг
+          <input type="number" id="afStep" step="any" value="100">
+        </label>
+        <button id="afFill" class="btn btn-primary" type="button">Заполнить</button>
+      </div>
+      <p id="afError" class="error" hidden></p>
+      <p class="hint-text">Создаст строки от «Начала» до «Конца» с указанным шагом и заменит текущие строки таблицы. Значения второй колонки заполните вручную.</p>
+    </section>
+
     <!-- УПРАВЛЕНИЕ -->
     <section class="controls">
       <label class="swap">

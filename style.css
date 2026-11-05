@@ -154,6 +154,49 @@ td input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 
 .btn-del:hover { color: var(--danger); background: #fef2f2; }
 
+/* ---------- Автозаполнение ---------- */
+.autofill-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.autofill-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  flex: 1 1 90px;
+}
+
+.autofill-row input,
+.autofill-row select {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: inherit;
+  width: 100%;
+}
+
+.autofill-row input:focus,
+.autofill-row select:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.autofill-row .btn { flex: 0 0 auto; }
+
+.hint-text {
+  margin-top: 12px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
 /* ---------- Управление ---------- */
 .controls {
   display: flex;

@@ -145,11 +145,15 @@ function buildChart() {
         }
       },
       scales: {
+        // ВАЖНО: явно числовые оси — иначе ось X «категорийная»
+        // и точки теряют координаты (уезжают в 0)
         x: {
+          type: 'linear',
           title: { display: true, text: xLabel },
           grid: { color: '#f0f1f4' }
         },
         y: {
+          type: 'linear',
           title: { display: true, text: yLabel },
           grid: { color: '#f0f1f4' }
         }
@@ -173,6 +177,62 @@ function downloadPNG() {
   a.download = 'graph.png';
   a.click();
 }
+
+/* ---------- Автозаполнение ---------- */
+
+const afCol = document.getElementById('afCol');
+const afStart = document.getElementById('afStart');
+const afEnd = document.getElementById('afEnd');
+const afStep = document.getElementById('afStep');
+const afFill = document.getElementById('afFill');
+const afError = document.getElementById('afError');
+
+const MAX_ROWS = 500;
+
+function autofill() {
+  afError.hidden = true;
+
+  const start = Number(afStart.value);
+  const end = Number(afEnd.value);
+  const step = Number(afStep.value);
+
+  if (!Number.isFinite(start) || !Number.isFinite(end) || !Number.isFinite(step)) {
+    afError.textContent = 'Все три поля должны быть числами.';
+    afError.hidden = false;
+    return;
+  }
+  if (step <= 0) {
+    afError.textContent = 'Шаг должен быть больше нуля.';
+    afError.hidden = false;
+    return;
+  }
+  if ((end - start) / step + 1 > MAX_ROWS) {
+    afError.textContent = `Слишком много строк (максимум ${MAX_ROWS}). Увеличьте шаг.`;
+    afError.hidden = false;
+    return;
+  }
+
+  const col = afCol.value; // 'hz' или 'db'
+
+  const n = Math.floor((end - start) / step + 1e-6); // количество шагов
+  if (n < 0) {
+    afError.textContent = 'Конечное значение должно быть больше начального.';
+    afError.hidden = false;
+    return;
+  }
+  tableBody.innerHTML = '';
+  rowCounter = 0;
+
+  for (let i = 0; i <= n; i++) {
+    addRow();
+    const input = tableBody.lastElementChild.querySelector(col === 'hz' ? '.val-hz' : '.val-db');
+    input.value = fmt(start + i * step);
+  }
+
+  hideError();
+}
+
+afFill.addEventListener('click', autofill);
 
 /* ---------- События ---------- */
 
