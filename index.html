@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hz / dB — построение графика</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="hero">
+    <h1>Hz<span>/</span>dB</h1>
+    <p class="subtitle">Введите значения в таблицу — и постройте график одним нажатием</p>
+  </header>
+
+  <main class="container">
+
+    <!-- ТАБЛИЦА -->
+    <section class="card">
+      <div class="card-head">
+        <h2>Таблица значений</h2>
+        <button id="addRow" class="btn btn-ghost" type="button">+ Добавить строку</button>
+      </div>
+
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th class="num">#</th>
+            <th>Hz <span class="hint">(ось Y)</span></th>
+            <th>dB <span class="hint">(ось X)</span></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+
+      <p id="error" class="error" hidden></p>
+    </section>
+
+    <!-- УПРАВЛЕНИЕ -->
+    <section class="controls">
+      <label class="swap">
+        <input type="checkbox" id="swapAxes">
+        Поменять оси (Hz → X, dB → Y)
+      </label>
+      <button id="clearAll" class="btn btn-ghost" type="button">Очистить</button>
+      <button id="build" class="btn btn-primary" type="button">Построить график</button>
+    </section>
+
+    <!-- ГРАФИК -->
+    <section class="card chart-card" id="chartCard" hidden>
+      <div class="card-head">
+        <h2>График</h2>
+        <button id="download" class="btn btn-ghost" type="button">Скачать PNG</button>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chart"></canvas>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>Минималистичный инструмент для быстрого построения графиков по точкам</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
