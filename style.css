@@ -215,6 +215,25 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 .btn-del:hover { color: var(--danger); background: #fef2f2; }
 
 /* ---------- Автозаполнение ---------- */
+.af-group {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.af-group:last-of-type { border-bottom: none; }
+
+.af-enable {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.af-enable input { accent-color: var(--accent); width: 15px; height: 15px; cursor: pointer; }
+
 .autofill-row {
   display: flex;
   align-items: flex-end;
@@ -250,6 +269,13 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 }
 
 .autofill-row .btn { flex: 0 0 auto; }
+
+.af-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
 
 .hint-text {
   margin-top: 12px;

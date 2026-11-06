@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hz / dB — построение графика</title>
-  <link rel="stylesheet" href="style.css?v=7">
+  <link rel="stylesheet" href="style.css?v=8">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <script>
     // применяем тему до первой отрисовки — чтобы не мигало
@@ -64,26 +64,36 @@
       <div class="card-head">
         <h2>Автозаполнение</h2>
       </div>
-      <div class="autofill-row">
-        <label>Колонка
-          <select id="afCol">
-            <option value="hz" selected>Hz (Y)</option>
-            <option value="db">dB (X)</option>
-          </select>
+
+      <div class="af-group">
+        <label class="af-enable">
+          <input type="checkbox" id="af1On" checked>
+          <span id="af1Name">Hz (X)</span>
         </label>
-        <label>Начало
-          <input type="number" id="afStart" step="any" value="1000">
-        </label>
-        <label>Конец
-          <input type="number" id="afEnd" step="any" value="1500">
-        </label>
-        <label>Шаг
-          <input type="number" id="afStep" step="any" value="100">
-        </label>
-        <button id="afFill" class="btn btn-primary" type="button">Заполнить</button>
+        <div class="autofill-row">
+          <label>Начало <input type="number" id="af1Start" step="any" value="1000"></label>
+          <label>Конец <input type="number" id="af1End" step="any" value="1500"></label>
+          <label>Шаг <input type="number" id="af1Step" step="any" value="100"></label>
+        </div>
       </div>
-      <p id="afError" class="error" hidden></p>
-      <p class="hint-text">Создаст строки от «Начала» до «Конца» с указанным шагом и заменит текущие строки таблицы. Значения второй колонки заполните вручную.</p>
+
+      <div class="af-group">
+        <label class="af-enable">
+          <input type="checkbox" id="af2On">
+          <span id="af2Name">dB (Y)</span>
+        </label>
+        <div class="autofill-row">
+          <label>Начало <input type="number" id="af2Start" step="any" value="0"></label>
+          <label>Конец <input type="number" id="af2End" step="any" value="500"></label>
+          <label>Шаг <input type="number" id="af2Step" step="any" value="100"></label>
+        </div>
+      </div>
+
+      <div class="af-actions">
+        <button id="afFill" class="btn btn-primary" type="button">Заполнить</button>
+        <p id="afError" class="error" hidden></p>
+      </div>
+      <p class="hint-text">Отметьте галочками, какие колонки заполнить, задайте диапазон и шаг — по кнопке «Заполнить» строки таблицы будут созданы заново. Количество строк — по самой длинной серии.</p>
     </section>
 
     <!-- УПРАВЛЕНИЕ -->
@@ -114,6 +124,6 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="script.js?v=7"></script>
+  <script src="script.js?v=8"></script>
 </body>
 </html>

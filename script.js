@@ -46,8 +46,9 @@ function updateAxisLabels() {
   title2.textContent = n[1];
   document.title = `${n[0]} / ${n[1]} — построение графика`;
 
-  afCol.options[0].textContent = `${n[0]} (${swapped ? 'Y' : 'X'})`;
-  afCol.options[1].textContent = `${n[1]} (${swapped ? 'X' : 'Y'})`;
+  // подписи в автозаполнении
+  af1Name.textContent = `${n[0]} (${swapped ? 'Y' : 'X'})`;
+  af2Name.textContent = `${n[1]} (${swapped ? 'X' : 'Y'})`;
 
   document.querySelectorAll('.val-hz').forEach(i => { i.placeholder = n[0]; });
   document.querySelectorAll('.val-db').forEach(i => { i.placeholder = n[1]; });
@@ -241,53 +242,77 @@ function downloadPNG() {
 
 /* ---------- Автозаполнение ---------- */
 
-const afCol = document.getElementById('afCol');
-const afStart = document.getElementById('afStart');
-const afEnd = document.getElementById('afEnd');
-const afStep = document.getElementById('afStep');
+const af1Name = document.getElementById('af1Name');
+const af2Name = document.getElementById('af2Name');
+const af1On = document.getElementById('af1On');
+const af1Start = document.getElementById('af1Start');
+const af1End = document.getElementById('af1End');
+const af1Step = document.getElementById('af1Step');
+const af2On = document.getElementById('af2On');
+const af2Start = document.getElementById('af2Start');
+const af2End = document.getElementById('af2End');
+const af2Step = document.getElementById('af2Step');
 const afFill = document.getElementById('afFill');
 const afError = document.getElementById('afError');
 
 const MAX_ROWS = 500;
 
-function autofill() {
-  afError.hidden = true;
+// читает параметры одной серии (группа полей), кидает ошибку с понятным текстом
+function readSeries(colName, on, startEl, endEl, stepEl) {
+  if (!on.checked) return { on: false };
 
-  const start = Number(afStart.value);
-  const end = Number(afEnd.value);
-  const step = Number(afStep.value);
+  const start = Number(startEl.value);
+  const end = Number(endEl.value);
+  const step = Number(stepEl.value);
 
   if (!Number.isFinite(start) || !Number.isFinite(end) || !Number.isFinite(step)) {
-    afError.textContent = 'Все три поля должны быть числами.';
-    afError.hidden = false;
-    return;
+    throw new Error(`«${colName}»: все три поля должны быть числами.`);
   }
   if (step <= 0) {
-    afError.textContent = 'Шаг должен быть больше нуля.';
-    afError.hidden = false;
-    return;
+    throw new Error(`«${colName}»: шаг должен быть больше нуля.`);
   }
-  if ((end - start) / step + 1 > MAX_ROWS) {
-    afError.textContent = `Слишком много строк (максимум ${MAX_ROWS}). Увеличьте шаг.`;
-    afError.hidden = false;
-    return;
-  }
-
-  const col = afCol.value; // 'hz' или 'db'
 
   const n = Math.floor((end - start) / step + 1e-6); // количество шагов
   if (n < 0) {
-    afError.textContent = 'Конечное значение должно быть больше начального.';
+    throw new Error(`«${colName}»: конечное значение должно быть больше начального.`);
+  }
+
+  return { on: true, n, start, step };
+}
+
+function autofill() {
+  afError.hidden = true;
+
+  try {
+    const s1 = readSeries(colNames()[0], af1On, af1Start, af1End, af1Step);
+    const s2 = readSeries(colNames()[1], af2On, af2Start, af2End, af2Step);
+
+    if (!s1.on && !s2.on) {
+      afError.textContent = 'Отметьте галочкой хотя бы одну колонку.';
+      afError.hidden = false;
+      return;
+    }
+
+    const rows = Math.max(s1.on ? s1.n + 1 : 0, s2.on ? s2.n + 1 : 0);
+    if (rows > MAX_ROWS) {
+      afError.textContent = `Слишком много строк (максимум ${MAX_ROWS}). Увеличьте шаг.`;
+      afError.hidden = false;
+      return;
+    }
+
+    tableBody.innerHTML = '';
+    rowCounter = 0;
+
+    for (let i = 0; i < rows; i++) {
+      addRow();
+      const tr = tableBody.lastElementChild;
+      if (s1.on && i <= s1.n) tr.querySelector('.val-hz').value = fmt(s1.start + i * s1.step);
+      if (s2.on && i <= s2.n) tr.querySelector('.val-db').value = fmt(s2.start + i * s2.step);
+    }
+  } catch (e) {
+    afError.textContent = e.message;
     afError.hidden = false;
     return;
-  }
-  tableBody.innerHTML = '';
-  rowCounter = 0;
-
-  for (let i = 0; i <= n; i++) {
-    addRow();
-    const input = tableBody.lastElementChild.querySelector(col === 'hz' ? '.val-hz' : '.val-db');
-    input.value = fmt(start + i * step);
   }
 
   hideError();
