@@ -2,6 +2,7 @@
 
 const tableBody = document.getElementById('tableBody');
 const addRowBtn = document.getElementById('addRow');
+const clearCol2Btn = document.getElementById('clearCol2');
 const buildBtn = document.getElementById('build');
 const clearBtn = document.getElementById('clearAll');
 const swapCheckbox = document.getElementById('swapAxes');
@@ -51,6 +52,8 @@ function updateAxisLabels() {
 
   document.querySelectorAll('.val-hz').forEach(i => { i.placeholder = n[0]; });
   document.querySelectorAll('.val-db').forEach(i => { i.placeholder = n[1]; });
+
+  clearCol2Btn.textContent = `Очистить ${n[1]}`;
 }
 
 /* ---------- Тема ---------- */
@@ -329,6 +332,18 @@ themeToggle.addEventListener('click', () => {
 });
 
 addRowBtn.addEventListener('click', addRow);
+
+// очистка второй колонки с подтверждением
+clearCol2Btn.addEventListener('click', () => {
+  const inputs = [...tableBody.querySelectorAll('.val-db')];
+  const filled = inputs.filter(i => i.value.trim() !== '');
+  if (!filled.length) return; // колонка и так пуста
+
+  if (confirm(`Удалить все значения из колонки «${colNames()[1]}»? (${filled.length} шт.)`)) {
+    inputs.forEach(i => { i.value = ''; });
+  }
+});
+
 buildBtn.addEventListener('click', buildChart);
 clearBtn.addEventListener('click', clearTable);
 downloadBtn.addEventListener('click', downloadPNG);

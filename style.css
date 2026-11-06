@@ -110,6 +110,13 @@ body {
   font-weight: 600;
 }
 
+.head-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 /* ---------- Таблица ---------- */
 table {
   width: 100%;

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hz / dB — построение графика</title>
-  <link rel="stylesheet" href="style.css?v=11">
+  <link rel="stylesheet" href="style.css?v=13">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <script>
     // применяем тему до первой отрисовки — чтобы не мигало
@@ -35,7 +35,10 @@
     <section class="card">
       <div class="card-head">
         <h2>Таблица значений</h2>
-        <button id="addRow" class="btn btn-ghost" type="button">+ Добавить строку</button>
+        <div class="head-actions">
+          <button id="clearCol2" class="btn btn-ghost" type="button">Очистить dB</button>
+          <button id="addRow" class="btn btn-ghost" type="button">+ Добавить строку</button>
+        </div>
       </div>
 
       <table id="dataTable">
@@ -111,6 +114,6 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="script.js?v=12"></script>
+  <script src="script.js?v=13"></script>
 </body>
 </html>
