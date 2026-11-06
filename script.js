@@ -278,7 +278,14 @@ function autofill() {
   // сохраняем значения ВТОРОЙ колонки — они не должны пропасть
   const savedOther = [...tableBody.querySelectorAll('.val-db')].map(i => i.value);
 
-  const rows = Math.max(n + 1, savedOther.length);
+  // последняя строка, где во второй колонке есть данные
+  let lastData = -1;
+  savedOther.forEach((v, i) => { if (v.trim() !== '') lastData = i; });
+
+  // оставляем: заполненные строки ИЛИ строки с данными во второй колонке,
+  // плюс ровно одна пустая строка в конце
+  const keep = Math.max(n + 1, lastData + 1);
+  const rows = keep + 1;
   if (rows > MAX_ROWS) {
     afError.textContent = `Слишком много строк (максимум ${MAX_ROWS}). Увеличьте шаг.`;
     afError.hidden = false;
