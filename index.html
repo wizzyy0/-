@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hz / dB — построение графика</title>
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=10">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <script>
     // применяем тему до первой отрисовки — чтобы не мигало
@@ -66,26 +66,40 @@
       </div>
 
       <div class="af-group">
-        <label class="af-enable">
-          <input type="checkbox" id="af1On" checked>
-          <span id="af1Name">Hz (X)</span>
-        </label>
+        <div class="af-head">
+          <label class="af-enable">
+            <input type="checkbox" id="af1On" checked>
+            <span id="af1Name">Hz (X)</span>
+          </label>
+          <label class="af-rnd" title="Шаг не учитывается — значения будут случайными от «Начала» до «Конца»">
+            <input type="checkbox" id="af1Rnd">
+            случайно
+          </label>
+        </div>
         <div class="autofill-row">
           <label>Начало <input type="number" id="af1Start" step="any" value="1000"></label>
           <label>Конец <input type="number" id="af1End" step="any" value="1500"></label>
-          <label>Шаг <input type="number" id="af1Step" step="any" value="100"></label>
+          <label id="af1StepLabel">Шаг <input type="number" id="af1Step" step="any" value="100"></label>
+          <label id="af1CountLabel" class="hidden">Строк <input type="number" id="af1Count" value="10" min="1"></label>
         </div>
       </div>
 
       <div class="af-group">
-        <label class="af-enable">
-          <input type="checkbox" id="af2On">
-          <span id="af2Name">dB (Y)</span>
-        </label>
+        <div class="af-head">
+          <label class="af-enable">
+            <input type="checkbox" id="af2On">
+            <span id="af2Name">dB (Y)</span>
+          </label>
+          <label class="af-rnd" title="Шаг не учитывается — значения будут случайными от «Начала» до «Конца»">
+            <input type="checkbox" id="af2Rnd">
+            случайно
+          </label>
+        </div>
         <div class="autofill-row">
           <label>Начало <input type="number" id="af2Start" step="any" value="0"></label>
           <label>Конец <input type="number" id="af2End" step="any" value="500"></label>
-          <label>Шаг <input type="number" id="af2Step" step="any" value="100"></label>
+          <label id="af2StepLabel">Шаг <input type="number" id="af2Step" step="any" value="100"></label>
+          <label id="af2CountLabel" class="hidden">Строк <input type="number" id="af2Count" value="10" min="1"></label>
         </div>
       </div>
 
@@ -93,7 +107,7 @@
         <button id="afFill" class="btn btn-primary" type="button">Заполнить</button>
         <p id="afError" class="error" hidden></p>
       </div>
-      <p class="hint-text">Отметьте галочками, какие колонки заполнить, задайте диапазон и шаг — по кнопке «Заполнить» строки таблицы будут созданы заново. Количество строк — по самой длинной серии.</p>
+      <p class="hint-text">Отметьте галочками, какие колонки заполнить, задайте диапазон и шаг — по кнопке «Заполнить» строки таблицы будут созданы заново. Галочка «случайно» игнорирует шаг и заполняет колонку случайными значениями из диапазона (укажите количество строк).</p>
     </section>
 
     <!-- УПРАВЛЕНИЕ -->
@@ -124,6 +138,6 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="script.js?v=8"></script>
+  <script src="script.js?v=10"></script>
 </body>
 </html>
