@@ -129,6 +129,26 @@ th {
 
 th .hint { font-weight: 400; text-transform: none; letter-spacing: 0; color: #b6bac2; }
 
+/* редактируемые названия колонок */
+.col-name {
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed transparent;
+  width: 90px;
+  padding: 0 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.col-name:hover,
+.col-name:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+
 td { padding: 6px 8px; border-bottom: 1px solid var(--line); }
 
 td.num { color: var(--muted); font-size: 0.85rem; width: 36px; }

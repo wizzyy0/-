@@ -9,9 +9,42 @@ const errorBox = document.getElementById('error');
 const chartCard = document.getElementById('chartCard');
 const downloadBtn = document.getElementById('download');
 const root = document.documentElement;
+const name1Input = document.getElementById('name1');
+const name2Input = document.getElementById('name2');
+const axis1Hint = document.getElementById('axis1');
+const axis2Hint = document.getElementById('axis2');
 
 let chart = null;
 let rowCounter = 0;
+
+/* ---------- Названия колонок и оси ---------- */
+
+const DEFAULT_NAME1 = 'Hz';
+const DEFAULT_NAME2 = 'dB';
+
+// текущие названия колонок (с фолбэком на Hz/dB, если поле пустое)
+function colNames() {
+  return [
+    name1Input.value.trim() || DEFAULT_NAME1,
+    name2Input.value.trim() || DEFAULT_NAME2
+  ];
+}
+
+// подписи «(ось X)»/«(ось Y)» в шапке + подписи в автозаполнении + плейсхолдеры
+// по умолчанию первая колонка -> ось X, вторая -> ось Y
+function updateAxisLabels() {
+  const swapped = swapCheckbox.checked;
+  const n = colNames();
+
+  axis1Hint.textContent = swapped ? '(ось Y)' : '(ось X)';
+  axis2Hint.textContent = swapped ? '(ось X)' : '(ось Y)';
+
+  afCol.options[0].textContent = `${n[0]} (${swapped ? 'Y' : 'X'})`;
+  afCol.options[1].textContent = `${n[1]} (${swapped ? 'X' : 'Y'})`;
+
+  document.querySelectorAll('.val-hz').forEach(i => { i.placeholder = n[0]; });
+  document.querySelectorAll('.val-db').forEach(i => { i.placeholder = n[1]; });
+}
 
 /* ---------- Тема ---------- */
 
@@ -36,8 +69,8 @@ function addRow() {
 
   tr.innerHTML = `
     <td class="num">${rowCounter}</td>
-    <td><input type="number" step="any" placeholder="Hz" class="val-hz"></td>
-    <td><input type="number" step="any" placeholder="dB" class="val-db"></td>
+    <td><input type="number" step="any" placeholder="${colNames()[0]}" class="val-hz"></td>
+    <td><input type="number" step="any" placeholder="${colNames()[1]}" class="val-db"></td>
     <td><button class="btn btn-del" title="Удалить строку" type="button">✕</button></td>
   `;
 
@@ -117,15 +150,15 @@ function buildChart() {
   const points = collectData();
   if (!points) return;
 
-  // сортируем по оси X, чтобы линия была аккуратной
+  // по умолчанию: первая колонка -> ось X, вторая -> ось Y
   const swapped = swapCheckbox.checked;
-  // по умолчанию (как просили): Hz → Y, dB → X
+  const n = colNames();
   const pts = points
-    .map(p => swapped ? { x: p.hz, y: p.db } : { x: p.db, y: p.hz })
+    .map(p => swapped ? { x: p.db, y: p.hz } : { x: p.hz, y: p.db })
     .sort((a, b) => a.x - b.x);
 
-  const xLabel = swapped ? 'Hz' : 'dB';
-  const yLabel = swapped ? 'dB' : 'Hz';
+  const xLabel = swapped ? n[1] : n[0];
+  const yLabel = swapped ? n[0] : n[1];
 
   chartCard.hidden = false;
 
@@ -253,6 +286,16 @@ function autofill() {
   hideError();
 }
 
+// Enter в поле ввода → строим график
+tableBody.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); buildChart(); }
+});
+
+// Enter в названии колонки — просто снимаем фокус
+[name1Input, name2Input].forEach(inp => inp.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+}));
+
 afFill.addEventListener('click', autofill);
 
 /* ---------- События ---------- */
@@ -270,14 +313,17 @@ addRowBtn.addEventListener('click', addRow);
 buildBtn.addEventListener('click', buildChart);
 clearBtn.addEventListener('click', clearTable);
 downloadBtn.addEventListener('click', downloadPNG);
-swapCheckbox.addEventListener('change', () => { if (chart) buildChart(); });
-
-// Enter в поле ввода → строим график
-tableBody.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') { e.preventDefault(); buildChart(); }
+name1Input.addEventListener('input', updateAxisLabels);
+name2Input.addEventListener('input', updateAxisLabels);
+name1Input.addEventListener('change', () => { if (chart) buildChart(); });
+name2Input.addEventListener('change', () => { if (chart) buildChart(); });
+swapCheckbox.addEventListener('change', () => {
+  updateAxisLabels();
+  if (chart) buildChart();
 });
 
-// старт: три пустые строки для примера
+// старт: обновить подписи и создать три пустые строки
+updateAxisLabels();
 addRow();
 addRow();
 addRow();

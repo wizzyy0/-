@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hz / dB — построение графика</title>
-  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="stylesheet" href="style.css?v=6">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <script>
     // применяем тему до первой отрисовки — чтобы не мигало
@@ -42,8 +42,14 @@
         <thead>
           <tr>
             <th class="num">#</th>
-            <th>Hz <span class="hint">(ось Y)</span></th>
-            <th>dB <span class="hint">(ось X)</span></th>
+            <th>
+              <input type="text" id="name1" class="col-name" value="Hz" maxlength="20" spellcheck="false">
+              <span class="hint" id="axis1">(ось X)</span>
+            </th>
+            <th>
+              <input type="text" id="name2" class="col-name" value="dB" maxlength="20" spellcheck="false">
+              <span class="hint" id="axis2">(ось Y)</span>
+            </th>
             <th></th>
           </tr>
         </thead>
@@ -84,7 +90,7 @@
     <section class="controls">
       <label class="swap">
         <input type="checkbox" id="swapAxes">
-        Поменять оси (Hz → X, dB → Y)
+        Поменять оси
       </label>
       <button id="clearAll" class="btn btn-ghost" type="button">Очистить</button>
       <button id="build" class="btn btn-primary" type="button">Построить график</button>
@@ -108,6 +114,6 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="script.js?v=4"></script>
+  <script src="script.js?v=6"></script>
 </body>
 </html>
