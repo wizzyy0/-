@@ -337,3 +337,166 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
   .chart-wrap { height: 300px; }
   th .hint { display: none; }
 }
+
+/* ---------- Аккаунт (шапка) ---------- */
+.auth-bar {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-chip { display: flex; align-items: center; gap: 8px; }
+
+.user-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-sm { padding: 8px 14px; font-size: 0.85rem; }
+
+/* ---------- Модальные окна ---------- */
+[hidden] { display: none !important; }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(10, 12, 16, 0.55);
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 430px;
+  max-height: 82vh;
+  overflow-y: auto;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+  transition: background 0.25s, border-color 0.25s;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.modal-close:hover { color: var(--text); background: var(--bg); }
+
+.modal-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.modal-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 4px;
+  margin: 14px 0 16px;
+}
+
+.modal-tab {
+  flex: 1;
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 8px 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.modal-tab.active {
+  background: var(--card);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.field input {
+  font: inherit;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: inherit;
+}
+
+.field input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.modal-submit { width: 100%; margin-top: 4px; }
+
+/* ---------- Личный кабинет ---------- */
+.cab-sub { color: var(--muted); font-size: 0.88rem; margin-bottom: 14px; }
+
+.cab-list { display: flex; flex-direction: column; gap: 10px; }
+
+.cab-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.cab-name { font-weight: 600; font-size: 0.95rem; }
+
+.cab-date {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+
+.cab-actions { display: flex; gap: 6px; flex: 0 0 auto; }
+
+.cab-del:hover { color: var(--danger); border-color: var(--danger); }
+
+.cab-empty { color: var(--muted); font-size: 0.9rem; }
+
+@media (max-width: 560px) {
+  .user-name { display: none; }
+  .cab-item { flex-direction: column; align-items: flex-start; }
+}

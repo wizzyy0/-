@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hz / dB — построение графика</title>
-  <link rel="stylesheet" href="style.css?v=13">
+  <link rel="stylesheet" href="style.css?v=14">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <script>
     // применяем тему до первой отрисовки — чтобы не мигало
@@ -18,6 +18,16 @@
   </script>
 </head>
 <body>
+
+  <!-- АККАУНТ -->
+  <div class="auth-bar">
+    <button id="btnLogin" class="btn btn-ghost btn-sm" type="button">Войти</button>
+    <div id="userChip" class="user-chip" hidden>
+      <span id="userLogin" class="user-name"></span>
+      <button id="btnCabinet" class="btn btn-ghost btn-sm" type="button">Кабинет</button>
+      <button id="btnLogout" class="btn btn-ghost btn-sm" type="button">Выйти</button>
+    </div>
+  </div>
 
   <button id="themeToggle" class="theme-toggle" type="button" aria-label="Переключить тему" title="Переключить тему">
     <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -100,7 +110,10 @@
     <section class="card chart-card" id="chartCard" hidden>
       <div class="card-head">
         <h2>График</h2>
-        <button id="download" class="btn btn-ghost" type="button">Скачать PNG</button>
+        <div class="head-actions">
+          <button id="saveCab" class="btn btn-ghost" type="button">Сохранить в кабинет</button>
+          <button id="download" class="btn btn-ghost" type="button">Скачать PNG</button>
+        </div>
       </div>
       <div class="chart-wrap">
         <canvas id="chart"></canvas>
@@ -113,7 +126,38 @@
     <p>Минималистичный инструмент для быстрого построения графиков по точкам</p>
   </footer>
 
+  <!-- МОДАЛКА: ВХОД / РЕГИСТРАЦИЯ -->
+  <div id="authModal" class="modal-overlay" hidden>
+    <div class="modal">
+      <button id="authClose" class="modal-close" type="button" aria-label="Закрыть">✕</button>
+      <div class="modal-tabs">
+        <button id="tabLogin" class="modal-tab active" type="button">Вход</button>
+        <button id="tabRegister" class="modal-tab" type="button">Регистрация</button>
+      </div>
+      <p id="authError" class="error" hidden></p>
+      <form id="authForm">
+        <label class="field">Логин
+          <input type="text" id="authLogin" maxlength="20" autocomplete="username" spellcheck="false">
+        </label>
+        <label class="field">Пароль
+          <input type="password" id="authPass" autocomplete="current-password">
+        </label>
+        <button type="submit" id="authSubmit" class="btn btn-primary modal-submit">Войти</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- МОДАЛКА: ЛИЧНЫЙ КАБИНЕТ -->
+  <div id="cabModal" class="modal-overlay" hidden>
+    <div class="modal">
+      <button id="cabClose" class="modal-close" type="button" aria-label="Закрыть">✕</button>
+      <h2 class="modal-title">Личный кабинет</h2>
+      <p class="cab-sub" id="cabUser"></p>
+      <div id="cabList" class="cab-list"></div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="script.js?v=13"></script>
+  <script src="script.js?v=14"></script>
 </body>
 </html>

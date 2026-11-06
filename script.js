@@ -361,3 +361,273 @@ updateAxisLabels();
 addRow();
 addRow();
 addRow();
+
+/* ---------- Аккаунт: вход / регистрация ---------- */
+
+const USERS_KEY = 'gc_users_v1';
+const SESSION_KEY = 'gc_session_v1';
+const chartsKey = (login) => `gc_charts_${login}`;
+const MAX_SAVED = 50;
+
+const btnLogin = document.getElementById('btnLogin');
+const userChip = document.getElementById('userChip');
+const userLoginSpan = document.getElementById('userLogin');
+const btnCabinet = document.getElementById('btnCabinet');
+const btnLogout = document.getElementById('btnLogout');
+const saveCabBtn = document.getElementById('saveCab');
+
+const authModal = document.getElementById('authModal');
+const authForm = document.getElementById('authForm');
+const authLoginInput = document.getElementById('authLogin');
+const authPassInput = document.getElementById('authPass');
+const authError = document.getElementById('authError');
+const authSubmit = document.getElementById('authSubmit');
+const authClose = document.getElementById('authClose');
+const tabLogin = document.getElementById('tabLogin');
+const tabRegister = document.getElementById('tabRegister');
+
+const cabModal = document.getElementById('cabModal');
+const cabClose = document.getElementById('cabClose');
+const cabUser = document.getElementById('cabUser');
+const cabList = document.getElementById('cabList');
+
+function sha256(str) {
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)).then((buf) =>
+    [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('')
+  );
+}
+
+function getUsers() {
+  try { return JSON.parse(localStorage.getItem(USERS_KEY)) || []; } catch (e) { return []; }
+}
+function setUsers(list) { localStorage.setItem(USERS_KEY, JSON.stringify(list)); }
+
+function currentLogin() { return localStorage.getItem(SESSION_KEY) || ''; }
+
+function getCharts(login) {
+  try { return JSON.parse(localStorage.getItem(chartsKey(login))) || []; } catch (e) { return []; }
+}
+function setCharts(login, list) { localStorage.setItem(chartsKey(login), JSON.stringify(list)); }
+
+function updateAuthUI() {
+  const login = currentLogin();
+  btnLogin.hidden = !!login;
+  userChip.hidden = !login;
+  userLoginSpan.textContent = login;
+}
+
+let authMode = 'login';
+
+function openAuth(mode, msg) {
+  authMode = mode;
+  authError.hidden = true;
+  authPassInput.value = '';
+  tabLogin.classList.toggle('active', mode === 'login');
+  tabRegister.classList.toggle('active', mode === 'register');
+  authSubmit.textContent = mode === 'login' ? 'Войти' : 'Создать аккаунт';
+  if (msg) { authError.textContent = msg; authError.hidden = false; }
+  authModal.hidden = false;
+  setTimeout(() => authLoginInput.focus(), 50);
+}
+
+function closeModals() {
+  authModal.hidden = true;
+  cabModal.hidden = true;
+}
+
+function authFail(msg) {
+  authError.textContent = msg;
+  authError.hidden = false;
+}
+
+authForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  authError.hidden = true;
+
+  const login = authLoginInput.value.trim();
+  const pass = authPassInput.value;
+
+  if (login.length < 3 || login.length > 20) return authFail('Логин должен быть от 3 до 20 символов.');
+  if (pass.length < 4) return authFail('Пароль должен быть минимум 4 символа.');
+
+  const users = getUsers();
+  const existing = users.find(u => u.login.toLowerCase() === login.toLowerCase());
+
+  if (authMode === 'register') {
+    if (existing) return authFail('Такой логин уже занят.');
+    const salt = [...crypto.getRandomValues(new Uint8Array(8))]
+      .map(b => b.toString(16).padStart(2, '0')).join('');
+    const hash = await sha256(salt + pass);
+    users.push({ login, salt, hash });
+    setUsers(users);
+    localStorage.setItem(SESSION_KEY, login);
+  } else {
+    if (!existing) return authFail('Неверный логин или пароль.');
+    const hash = await sha256(existing.salt + pass);
+    if (hash !== existing.hash) return authFail('Неверный логин или пароль.');
+    localStorage.setItem(SESSION_KEY, existing.login);
+  }
+
+  updateAuthUI();
+  closeModals();
+  authForm.reset();
+});
+
+btnLogin.addEventListener('click', () => openAuth('login'));
+tabLogin.addEventListener('click', () => openAuth('login'));
+tabRegister.addEventListener('click', () => openAuth('register'));
+authClose.addEventListener('click', closeModals);
+
+btnLogout.addEventListener('click', () => {
+  localStorage.removeItem(SESSION_KEY);
+  updateAuthUI();
+  closeModals();
+});
+
+// клик по фону модалки и Esc — закрыть
+[authModal, cabModal].forEach(m => m.addEventListener('click', (e) => {
+  if (e.target === m) closeModals();
+}));
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModals(); });
+
+/* ---------- Личный кабинет: сохранение графиков ---------- */
+
+function saveChartToCabinet() {
+  const login = currentLogin();
+  if (!login) { openAuth('login', 'Войдите, чтобы сохранять графики в кабинете.'); return; }
+
+  const rows = [...tableBody.rows]
+    .map(tr => ({
+      a: tr.querySelector('.val-hz').value.trim(),
+      b: tr.querySelector('.val-db').value.trim()
+    }))
+    .filter(r => r.a !== '' || r.b !== '');
+
+  if (!rows.length) {
+    saveCabBtn.textContent = 'Таблица пуста';
+    setTimeout(() => { saveCabBtn.textContent = 'Сохранить в кабинет'; }, 1500);
+    return;
+  }
+
+  const [c1, c2] = colNames();
+  const now = new Date();
+  const entry = {
+    id: 'c' + now.getTime(),
+    name: `${c1} / ${c2}`,
+    date: now.toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }),
+    col1: c1,
+    col2: c2,
+    swapped: swapCheckbox.checked,
+    rows
+  };
+
+  const list = getCharts(login);
+  list.unshift(entry);
+  if (list.length > MAX_SAVED) list.length = MAX_SAVED;
+  setCharts(login, list);
+
+  saveCabBtn.textContent = 'Сохранено ✓';
+  saveCabBtn.disabled = true;
+  setTimeout(() => {
+    saveCabBtn.textContent = 'Сохранить в кабинет';
+    saveCabBtn.disabled = false;
+  }, 1500);
+}
+
+function openCabinet() {
+  const login = currentLogin();
+  if (!login) { openAuth('login', 'Войдите, чтобы открыть кабинет.'); return; }
+  cabUser.textContent = `Аккаунт: ${login}`;
+  renderCabinet();
+  cabModal.hidden = false;
+}
+
+function renderCabinet() {
+  const login = currentLogin();
+  const list = getCharts(login);
+  cabList.innerHTML = '';
+
+  if (!list.length) {
+    const p = document.createElement('p');
+    p.className = 'cab-empty';
+    p.textContent = 'Пока нет сохранённых графиков. Постройте график и нажмите «Сохранить в кабинет».';
+    cabList.appendChild(p);
+    return;
+  }
+
+  list.forEach((item) => {
+    const row = document.createElement('div');
+    row.className = 'cab-item';
+
+    const info = document.createElement('div');
+    info.className = 'cab-info';
+    const name = document.createElement('div');
+    name.className = 'cab-name';
+    name.textContent = item.name;
+    const date = document.createElement('div');
+    date.className = 'cab-date';
+    date.textContent = `${item.date} · точек: ${item.rows.length}`;
+    info.appendChild(name);
+    info.appendChild(date);
+
+    const actions = document.createElement('div');
+    actions.className = 'cab-actions';
+
+    const loadBtn = document.createElement('button');
+    loadBtn.className = 'btn btn-ghost btn-sm';
+    loadBtn.type = 'button';
+    loadBtn.textContent = 'Загрузить';
+    loadBtn.addEventListener('click', () => loadChartFromCabinet(item));
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn btn-ghost btn-sm cab-del';
+    delBtn.type = 'button';
+    delBtn.textContent = 'Удалить';
+    delBtn.addEventListener('click', () => {
+      if (!confirm(`Удалить график «${item.name}» (${item.date})?`)) return;
+      const fresh = getCharts(currentLogin()).filter(c => c.id !== item.id);
+      setCharts(currentLogin(), fresh);
+      renderCabinet();
+    });
+
+    actions.appendChild(loadBtn);
+    actions.appendChild(delBtn);
+
+    row.appendChild(info);
+    row.appendChild(actions);
+    cabList.appendChild(row);
+  });
+}
+
+function loadChartFromCabinet(item) {
+  name1Input.value = item.col1;
+  name2Input.value = item.col2;
+  swapCheckbox.checked = !!item.swapped;
+
+  tableBody.innerHTML = '';
+  rowCounter = 0;
+  item.rows.forEach(r => {
+    addRow();
+    const tr = tableBody.lastElementChild;
+    tr.querySelector('.val-hz').value = r.a;
+    tr.querySelector('.val-db').value = r.b;
+  });
+  if (!tableBody.rows.length) addRow();
+
+  updateAxisLabels();
+  closeModals();
+  buildChart();
+}
+
+btnCabinet.addEventListener('click', openCabinet);
+cabClose.addEventListener('click', closeModals);
+saveCabBtn.addEventListener('click', saveChartToCabinet);
+
+// старт: если «сессия» указывает на удалённый аккаунт — сбрасываем
+(function initSession() {
+  const login = currentLogin();
+  if (login && !getUsers().some(u => u.login === login)) {
+    localStorage.removeItem(SESSION_KEY);
+  }
+  updateAuthUI();
+})();
