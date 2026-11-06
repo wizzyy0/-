@@ -139,8 +139,6 @@ th .hint { font-weight: 400; text-transform: none; letter-spacing: 0; color: #b6
   border-bottom: 1px dashed transparent;
   width: 90px;
   padding: 0 2px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
 .col-name:hover,

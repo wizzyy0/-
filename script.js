@@ -13,6 +13,8 @@ const name1Input = document.getElementById('name1');
 const name2Input = document.getElementById('name2');
 const axis1Hint = document.getElementById('axis1');
 const axis2Hint = document.getElementById('axis2');
+const title1 = document.getElementById('title1');
+const title2 = document.getElementById('title2');
 
 let chart = null;
 let rowCounter = 0;
@@ -38,6 +40,11 @@ function updateAxisLabels() {
 
   axis1Hint.textContent = swapped ? '(ось Y)' : '(ось X)';
   axis2Hint.textContent = swapped ? '(ось X)' : '(ось Y)';
+
+  // заголовок сайта повторяет названия колонок
+  title1.textContent = n[0];
+  title2.textContent = n[1];
+  document.title = `${n[0]} / ${n[1]} — построение графика`;
 
   afCol.options[0].textContent = `${n[0]} (${swapped ? 'Y' : 'X'})`;
   afCol.options[1].textContent = `${n[1]} (${swapped ? 'X' : 'Y'})`;
