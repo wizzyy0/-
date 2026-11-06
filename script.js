@@ -48,7 +48,6 @@ function updateAxisLabels() {
 
   // подписи в автозаполнении
   af1Name.textContent = `${n[0]} (${swapped ? 'Y' : 'X'})`;
-  af2Name.textContent = `${n[1]} (${swapped ? 'X' : 'Y'})`;
 
   document.querySelectorAll('.val-hz').forEach(i => { i.placeholder = n[0]; });
   document.querySelectorAll('.val-db').forEach(i => { i.placeholder = n[1]; });
@@ -243,123 +242,57 @@ function downloadPNG() {
 /* ---------- Автозаполнение ---------- */
 
 const af1Name = document.getElementById('af1Name');
-const af2Name = document.getElementById('af2Name');
-const af1On = document.getElementById('af1On');
 const af1Start = document.getElementById('af1Start');
 const af1End = document.getElementById('af1End');
 const af1Step = document.getElementById('af1Step');
-const af2On = document.getElementById('af2On');
-const af2Start = document.getElementById('af2Start');
-const af2End = document.getElementById('af2End');
-const af2Step = document.getElementById('af2Step');
-const af1Rnd = document.getElementById('af1Rnd');
-const af2Rnd = document.getElementById('af2Rnd');
-const af1StepLabel = document.getElementById('af1StepLabel');
-const af2StepLabel = document.getElementById('af2StepLabel');
-const af1CountLabel = document.getElementById('af1CountLabel');
-const af2CountLabel = document.getElementById('af2CountLabel');
-const af1Count = document.getElementById('af1Count');
-const af2Count = document.getElementById('af2Count');
 const afFill = document.getElementById('afFill');
 const afError = document.getElementById('afError');
 
 const MAX_ROWS = 500;
 
-// переключение поля «Шаг» <-> «Строк» при галочке «случайно»
-function updateRandomUI() {
-  af1StepLabel.classList.toggle('hidden', af1Rnd.checked);
-  af1CountLabel.classList.toggle('hidden', !af1Rnd.checked);
-  af2StepLabel.classList.toggle('hidden', af2Rnd.checked);
-  af2CountLabel.classList.toggle('hidden', !af2Rnd.checked);
-}
-
-// читает параметры одной серии (группа полей), кидает ошибку с понятным текстом
-function readSeries(colName, on, rnd, startEl, endEl, stepEl, countEl) {
-  if (!on.checked) return { on: false };
-
-  const start = Number(startEl.value);
-  const end = Number(endEl.value);
-
-  if (!Number.isFinite(start) || !Number.isFinite(end)) {
-    throw new Error(`«${colName}»: начальное и конечное значения должны быть числами.`);
-  }
-  if (end < start) {
-    throw new Error(`«${colName}»: конечное значение должно быть больше начального.`);
-  }
-
-  if (rnd.checked) {
-    // случайный режим: шаг не учитывается
-    const count = Number(countEl.value);
-    if (!Number.isFinite(count) || count < 1) {
-      throw new Error(`«${colName}»: количество строк должно быть числом от 1.`);
-    }
-    return { on: true, random: true, count: Math.floor(count), start, end };
-  }
-
-  const step = Number(stepEl.value);
-  if (!Number.isFinite(step)) {
-    throw new Error(`«${colName}»: шаг должен быть числом.`);
-  }
-  if (step <= 0) {
-    throw new Error(`«${colName}»: шаг должен быть больше нуля.`);
-  }
-
-  const n = Math.floor((end - start) / step + 1e-6); // количество шагов
-  return { on: true, random: false, n, start, step };
-}
-
-// случайное значение в диапазоне [start; end], округлённое до 2 знаков
-function randBetween(start, end) {
-  const v = start + Math.random() * (end - start);
-  return Math.round(v * 100) / 100;
-}
-
 function autofill() {
   afError.hidden = true;
 
-  try {
-    const s1 = readSeries(colNames()[0], af1On, af1Rnd, af1Start, af1End, af1Step, af1Count);
-    const s2 = readSeries(colNames()[1], af2On, af2Rnd, af2Start, af2End, af2Step, af2Count);
+  const start = Number(af1Start.value);
+  const end = Number(af1End.value);
+  const step = Number(af1Step.value);
 
-    if (!s1.on && !s2.on) {
-      afError.textContent = 'Отметьте галочкой хотя бы одну колонку.';
-      afError.hidden = false;
-      return;
-    }
-
-    const rows = Math.max(
-      s1.on ? (s1.random ? s1.count : s1.n + 1) : 0,
-      s2.on ? (s2.random ? s2.count : s2.n + 1) : 0
-    );
-    if (rows > MAX_ROWS) {
-      afError.textContent = `Слишком много строк (максимум ${MAX_ROWS}). Увеличьте шаг или уменьшите количество строк.`;
-      afError.hidden = false;
-      return;
-    }
-
-    tableBody.innerHTML = '';
-    rowCounter = 0;
-
-    for (let i = 0; i < rows; i++) {
-      addRow();
-      const tr = tableBody.lastElementChild;
-      if (s1.on) {
-        const v = s1.random
-          ? (i < s1.count ? randBetween(s1.start, s1.end) : null)
-          : (i <= s1.n ? s1.start + i * s1.step : null);
-        if (v !== null) tr.querySelector('.val-hz').value = fmt(v);
-      }
-      if (s2.on) {
-        const v = s2.random
-          ? (i < s2.count ? randBetween(s2.start, s2.end) : null)
-          : (i <= s2.n ? s2.start + i * s2.step : null);
-        if (v !== null) tr.querySelector('.val-db').value = fmt(v);
-      }
-    }
-  } catch (e) {
-    afError.textContent = e.message;
+  if (!Number.isFinite(start) || !Number.isFinite(end) || !Number.isFinite(step)) {
+    afError.textContent = 'Все три поля должны быть числами.';
     afError.hidden = false;
     return;
+  }
+  if (step <= 0) {
+    afError.textContent = 'Шаг должен быть больше нуля.';
+    afError.hidden = false;
+    return;
+  }
+
+  const n = Math.floor((end - start) / step + 1e-6); // количество шагов
+  if (n < 0) {
+    afError.textContent = 'Конечное значение должно быть больше начального.';
+    afError.hidden = false;
+    return;
+  }
+
+  // сохраняем значения ВТОРОЙ колонки — они не должны пропасть
+  const savedOther = [...tableBody.querySelectorAll('.val-db')].map(i => i.value);
+
+  const rows = Math.max(n + 1, savedOther.length);
+  if (rows > MAX_ROWS) {
+    afError.textContent = `Слишком много строк (максимум ${MAX_ROWS}). Увеличьте шаг.`;
+    afError.hidden = false;
+    return;
+  }
+
+  tableBody.innerHTML = '';
+  rowCounter = 0;
+
+  for (let i = 0; i < rows; i++) {
+    addRow();
+    const tr = tableBody.lastElementChild;
+    if (i <= n) tr.querySelector('.val-hz').value = fmt(start + i * step);
+    if (savedOther[i] !== undefined) tr.querySelector('.val-db').value = savedOther[i];
   }
 
   hideError();
@@ -376,8 +309,6 @@ tableBody.addEventListener('keydown', (e) => {
 }));
 
 afFill.addEventListener('click', autofill);
-af1Rnd.addEventListener('change', updateRandomUI);
-af2Rnd.addEventListener('change', updateRandomUI);
 
 /* ---------- События ---------- */
 
